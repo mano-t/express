@@ -15,7 +15,7 @@ var app = express();
 
 // view engine setupconst { MongoClient } = require("mongodb");
 // 下のURIをご自分の値に変更してください
-const uri = "mongodb+srv://mano:password@test.lfwohhl.mongodb.net/?retryWrites=true&w=majorityß";
+const uri = "mongodb+srv://mano:Password@test.lfwohhl.mongodb.net/?retryWrites=true&w=majorityß";
 const client = new MongoClient(uri);
 async function run() {
 const database = client.db('notes');
