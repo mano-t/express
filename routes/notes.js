@@ -1,49 +1,31 @@
 var express = require('express');
 var router = express.Router();
+const cors = require('cors');
+require('dotenv').config();
 
-// 接続情報を設定
 const { MongoClient } = require("mongodb");
-const uri = "mongodb+srv://mano:Password@atlascluster.mhorg8t.mongodb.net/?retryWrites=true&w=majority";
-const client = new MongoClient(uri);
+const uri = process.env.MONGODB_URI;
 
-router.get('/', async (req, res) => {
-// データベース、コレクションを指定
-const database = client.db('notes');
-const notes = database.collection('notes');
+router.get('/:id', async (req, res) => {
+    let client;
+    try {
+        client = new MongoClient(uri);
+        await client.connect();
 
-// idが１のドキュメントを取得
-const query = { id: 2 };
-const note = await notes.findOne(query);
+        const database = client.db('notes');
+        const notes = database.collection('notes');
+        const query = { id: parseInt(req.params.id) };
+        const note = await notes.findOne(query);
 
-res.json(note);
-})
+        res.json(note);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    } finally {
+        if (client) {
+            await client.close();
+        }
+    }
+});
 
 module.exports = router;
-
-// // レスポンスのデータ（ノート全件）
-// const responseObjectDataAll = {
-// textObject1 : {
-// id: 1,
-// title: 'ノート１のタイトルです',
-// subTitle: 'ノート１のサブタイトルです',
-// bodyText: 'ノート１の本文です'
-// },
-// textObject2 : {
-// id: 2,
-// title: 'ノート２のタイトルです',
-// subTitle: 'ノート２のサブタイトルです',
-// bodyText: 'ノート２の本文です'
-// },
-// };
-// /**
-// * メモを全件取得するAPI
-// * @returns {Object[]} data
-// * @returns {number} data.id - ID
-// * @returns {string} data.title - タイトル
-// * @returns {string} data.text - 内容
-// */
-// router.get('/', function (req, res, next) {
-// // 全件取得して返す
-// res.json(responseObjectDataAll);
-// })
-// module.exports = router;
